@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Data & Insights{% endblock %}
+{% block nav_title %}About Dataset & Model{% endblock %}
+
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <title>About - Sleep Disorder Detection</title>
+    <link rel="shortcut icon" href="{% static 'images/moon.png' %}" type="image/png">
+    <!-- Your other CSS/JS links -->
+</head>
+<h1><i class="fas fa-database"></i> Sleep Disorder Prediction - Dataset Description</h1>
+
+<h2>📝 Input Fields Description</h2>
+<ol style="text-align: left;">
+    <li><strong>Gender:</strong> 0 = Male, 1 = Female</li>
+    <li><strong>Age:</strong> Age of the user in years</li>
+    <li><strong>Occupation:</strong> 
+        <ul>
+            <li><strong>0 = Student:</strong> School/College/University-going individuals</li>
+            <li><strong>1 = Employed:</strong> Includes professionals working in full-time jobs such as:
+                <ul>
+                    <li>Doctor</li>
+                    <li>Nurse</li>
+                    <li>Lawyer</li>
+                    <li>Salesperson</li>
+                    <li>Engineer</li>
+                    <li>Scientist</li>
+                    <li>Manager</li>
+                    <li>Accountant</li>
+                    <li>Software Engineer</li>
+                    <li>Teacher</li>
+                    <li>Sales Representative</li>
+                    <li>And other similar salaried roles</li>
+                </ul>
+            </li>
+            <li><strong>2 = Self-employed:</strong> Includes:
+                <ul>
+                    <li>Freelancers</li>
+                    <li>Business Owners</li>
+                    <li>Entrepreneurs</li>
+                    <li>Consultants</li>
+                    <li>Part-time independent workers</li>
+                </ul>
+            </li>
+        </ul>
+        <!-- <p style="margin-top: 8px;"><strong>Note:</strong> In our current dataset, all occupations are classified under the <em>Employed</em> category.</p> -->
+    </li>
+    
+    <li><strong>Sleep Duration:</strong> Average sleep duration in hours (e.g., 6.5)</li>
+    <li><strong>Quality of Sleep:</strong> Rating from 1 (Poor) to 10 (Excellent)</li>
+    <li><strong>Physical Activity Level:</strong> Level of physical activity per day (measured numerically)</li>
+    <li><strong>Stress Level:</strong> Rating from 1 (Low) to 10 (High)</li>
+    <li><strong>BMI Category:</strong>
+        <ul>
+            <li>0 = Underweight</li>
+            <li>1 = Normal weight</li>
+            <li>2 = Overweight</li>
+            <li>3 = Obese</li>
+        </ul>
+    </li>
+    <li><strong>Blood Pressure:</strong> 0 = Low, 1 = Normal, 2 = High</li>
+    <li><strong>Heart Rate:</strong> Measured in beats per minute (bpm)</li>
+    <li><strong>Daily Steps:</strong> Average number of steps taken daily</li>
+    <li><strong>Algorithm:</strong> User-selected ML model (Random Forest, CNN, or LSTM)</li>
+</ol>
+
+<hr>
+
+<h2><i class="fas fa-cogs"></i> Backend Workflow 🔧</h2>
+<p>Here’s how your input data is used in the backend to predict sleep disorders:</p>
+<ul style="text-align: left;">
+    <li><strong>Form Data Collection:</strong> All values entered in the form are collected using Django’s POST method.</li>
+    <li><strong>Preprocessing:</strong> The input is preprocessed (e.g., encoded, normalized) to match the format expected by the trained ML models.</li>
+    <li><strong>Model Prediction:</strong>
+        <ul>
+            <li>If <code>RF</code> is selected, a Random Forest model is used.</li>
+            <li>If <code>CNN</code> or <code>LSTM</code> is selected, the respective deep learning model is loaded.</li>
+        </ul>
+    </li>
+    <li><strong>Output Generation:</strong> The prediction result (e.g., type of sleep disorder or no disorder) is sent back to `output.html` and displayed along with suggested precautions.</li>
+    <li><strong>Security:</strong> CSRF protection is used to secure the form submission.</li>
+</ul>
+
+<p><em>Everything is handled inside Django views, and the trained ML models are loaded using libraries like joblib, pickle, or TensorFlow depending on the algorithm.</em></p>
+
+<hr>
+
+<h2>📊 Confusion Matrix</h2>
+<img src="{% static 'images/CNN.png' %}" alt="Confusion Matrix" style="width: 47%; border: 1px solid #ccc; border-radius: 10px; ">
+
+<p>
+    The confusion matrix above shows the performance of our classification model in detecting three categories: <strong>None</strong>, <strong>Sleep Apnea</strong>, and <strong>Insomnia</strong>.
+    Diagonal values show correct predictions. For example, it correctly classified 81 Insomnia cases. Minor misclassifications like 5 “None” predicted as “Sleep Apnea” indicate areas for model improvement.
+</p>
+<h2>🌳 Random Forest Model</h2>
+<img src="{% static 'images/RandomForest.png' %}" alt="Random Forest Feature Importance" style="width: 45%; border: 1px solid #ccc; border-radius: 10px;">
+
+<p>
+    Random Forest is an ensemble machine learning model that builds multiple decision trees and combines their results for a more accurate and stable prediction. It handles both numerical and categorical data well and reduces overfitting. In our application, it helps classify sleep disorders based on multiple health features. Feature importance from Random Forest reveals that factors like <strong>Stress Level, Sleep Duration, and Heart Rate</strong> play a crucial role in identifying disorders.
+</p>
+
+<h2>📈 LSTM Model Training Graph</h2>
+<img src="{% static 'images/LSTM.png' %}" alt="LSTM Training Graph" style="width: 47%; border: 1px solid #ccc; border-radius: 10px;">
+
+<p>
+    This graph displays the performance of the LSTM model over multiple training epochs. It shows how well the model is learning from the data. As training progresses, we see accuracy improving and loss reducing – indicating effective learning. The closeness between training and validation lines reflects good generalization, and no signs of overfitting.
+</p>
+
+<hr>
+
+<p><strong>✅ Conclusion:</strong> The visual insights above show that our models are performing reliably, especially LSTM for complex patterns. The backend pipeline ensures a smooth and secure user experience from input to prediction.</p>
+
+<div style="margin-top: 40px; text-align: right;">
+    <a href="{% url 'base' %}" style="text-decoration: none;">
+        <button style="background: linear-gradient(to right, #00b4db, #0083b0); color: white; font-size: 18px; padding: 12px 25px; border: none; border-radius: 10px; cursor: pointer;">
+            🏠 Back to Home
+        </button>
+    </a>
+</div>
+
+{% endblock %}

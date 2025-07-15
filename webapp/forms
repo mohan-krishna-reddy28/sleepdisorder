@@ -1,0 +1,21 @@
+from django import forms
+
+class SleepForm(forms.Form):
+    GENDER_CHOICES = [('0', 'Male'), ('1', 'Female')]
+    OCCUPATION_CHOICES = [('0', 'Student'), ('1', 'Employee'), ('2', 'Self-employed')]
+    BMI_CHOICES = [('0', 'Underweight'), ('1', 'Normal weight'), ('2', 'Overweight'), ('3', 'Obese')]
+    BP_CHOICES = [('0', 'Low'), ('1', 'Normal'), ('2', 'High')]
+    ALGORITHM_CHOICES = [('RF', 'Random Forest'), ('CNN', 'CNN'), ('LSTM', 'LSTM')]
+
+    gender = forms.ChoiceField(choices=GENDER_CHOICES, widget=forms.Select(attrs={'class': 'form-control'}))
+    age = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    occupation = forms.ChoiceField(choices=OCCUPATION_CHOICES, widget=forms.Select(attrs={'class': 'form-control'}))
+    sleep_duration = forms.FloatField(widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    quality_of_sleep = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    physical_activity_level = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    stress_level = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    bmi_category = forms.ChoiceField(choices=BMI_CHOICES, widget=forms.Select(attrs={'class': 'form-control'}))
+    blood_pressure = forms.ChoiceField(choices=BP_CHOICES, widget=forms.Select(attrs={'class': 'form-control'}))
+    heart_rate = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    daily_steps = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    algorithm = forms.ChoiceField(choices=ALGORITHM_CHOICES, widget=forms.Select(attrs={'class': 'form-control'}))

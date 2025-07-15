@@ -1,0 +1,303 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="{% static 'images/moon.png' %}" type="image/png">
+    <title>{% block title %}Sleep Disorder Predictor{% endblock %}</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #a3a3a3;
+
+        }
+
+        .sidebar {
+            height: 100vh;
+            width: 240px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: #3b3b3b;
+            padding-top: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;   
+            margin-top: 90px;
+        }
+
+        .sidebar ul li {
+            padding: 10px 20px;
+            font-weight: bold;
+            color: #e1e1e1;
+            margin: 10px 5px;
+            cursor: pointer;
+            margin: 25px 5px;
+        }
+
+        .sidebar ul li a {
+            padding: 20px 10px;
+            margin: 0 10px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #e1e1e1;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+
+        .sidebar ul li:hover {
+            background: #acadae;
+            color: #000;
+            /* padding: 10px 0;
+            margin: 0 10px; */
+            border-radius: 10px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #ffffff;
+        }
+
+        form {
+            background: #303030;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            max-width: 640px;
+            margin: 0 auto;
+            color: white;
+        }
+
+        label {
+            font-weight: 600;
+            margin-top: 20px;
+            display: block;
+        }
+
+        input[type="number"],
+        select {
+            width: 50%;
+            max-width: 50%;
+            box-sizing: border-box;
+            padding: 8px;
+            border-radius: 5px;
+            margin: 10px 0;
+            background-color: #444;
+            color: #fff;
+        }
+
+        input[type="range"] {
+            width: 95%;
+            max-width: 100%;
+            box-sizing: border-box;
+            color: #fff;
+            border: 1px solid #ccc;
+            margin: 10px 0;
+        }
+
+        /* Special styling for range to align with dark background */
+        input[type="range"] {
+            -webkit-appearance: none;
+            height: 5px;
+            background: #338fff;
+            border-radius: 10px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            /* -webkit-appearance: none; */
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 15px;
+            height: 15px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        label span {
+            float: right;
+            font-weight: normal;
+            margin-right: 40px;
+            font-size: 0.9em;
+        }
+
+
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 5px;
+        }
+
+        .radio-group label {
+            font-weight: normal;
+        }
+
+        button {
+            margin-top: 30px;
+            padding: 12px 25px;
+            font-size: 16px;
+            background-color: #2980b9;
+            border: none;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #1c6ba0;
+        }
+
+
+        .navbar {
+            background-color: #3b3b3b;
+            color: white;
+            padding: 10px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-left: 240px;
+            /* Push navbar to the right */
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            z-index: 1000;
+        }
+
+
+        .navbar h1 {
+            color: white;
+            margin: 20px;
+            font-size: 24px;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            background-color: #f44336;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 30px;
+        }
+
+        .navbar a:hover {
+            background-color: #da190b;
+        }
+        .team-list{
+            margin-left: -55px;
+
+        }
+        .team-list li{
+            list-style: none;
+
+        }
+
+        /* To prevent form from hiding behind navbar */
+        .main {
+            padding: 20px 60px;
+            margin-top: 85px;
+            text-align: center;
+            margin-left: 200px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="navbar">
+        <h1>{% block nav_title %}Sleep Disorder Predictor{% endblock %}</h1>
+        <a href="{% url 'home' %}">Log Out</a>
+    </div>
+    <div class="sidebar">
+        <ul>
+            <li><a href="{% url 'input' %}">🛌 Prediction</a></li>
+            <li><a href="{% url 'about' %}">📁 About</a></li>
+            <li><a href="{% url 'team' %}">👥 Team</a></li>
+        </ul>
+    </div>
+    <div class="main">
+        {% block content %}
+        <div style="margin-top: 40px; text-align: center;">
+            <a href="{% url 'input' %}" style="text-decoration: none;">
+                <button style="background: linear-gradient(to right, #00b4db, #0083b0); color: white; font-size: 20px; padding: 12px 30px; border: none; border-radius: 10px; cursor: pointer; transition: 0.3s;">
+                    🔮 Click Here to Predict Your Sleep Disorder
+                </button>
+            </a>
+        </div>
+        
+        <section style="padding: 25px; text-align: left;font-size: 16px;">
+            <h2 style="color: #2c3e50;">😴 Importance of Sleep & ML-Based Prediction</h2>
+            
+            <p style="color:black; font-size: 20px;">Sleep plays a critical role in maintaining overall health—both physical and mental. An individual's sleep quality directly impacts productivity, emotional stability, and long-term well-being.</p>
+            
+            <h3 style="color: #2c3e50;">🚨 Consequences of Sleep Disorders:</h3>
+            <ul style="color: black; font-size: 20px;">
+                <li>⚠️ Chronic fatigue and reduced cognitive ability</li>
+                <li>⚠️ Increased risk of heart disease, obesity, and diabetes</li>
+                <li>⚠️ Elevated stress and anxiety levels</li>
+                <li>⚠️ Daytime drowsiness affecting work and driving safety</li>
+            </ul>
+        
+            <h3 style="color: #34495e;">🧬 Types of Sleep Disorders (from dataset & model):</h3>
+            <ul style="color: black; font-size: 20px;">
+                <li>Insomnia – Difficulty falling or staying asleep</li>
+                <li>Sleep Apnea – Interrupted breathing during sleep</li>
+                <li>Restless Leg Syndrome – Uncontrollable urge to move legs while resting</li>
+                <li>Narcolepsy – Sudden sleep attacks and daytime drowsiness</li>
+            </ul>
+        
+            <h3 style="color: #34495e;">🤖 Role of Machine Learning in This Project:</h3>
+            <p style="color: black; font-size: 20px;">In our project, we apply machine learning techniques such as <strong style="color: #0065a9;">Random Forest</strong>, <strong style="color: #0065a9;">Convolutional Neural Networks (CNN)</strong>, and <strong style="color: #0065a9;">Long Short-Term Memory (LSTM)</strong> to classify individuals into potential sleep disorder categories based on their lifestyle, health, and activity data.</p>
+            
+            <h4 style="margin-top: 15px;">🔍 Input Features:</h4>
+            <ul style="color: black; font-size: 20px;">
+                <li>Gender, Age, Occupation</li>
+                <li>Sleep Duration, Quality of Sleep</li>
+                <li>Physical Activity Level, Stress Level</li>
+                <li>BMI Category, Blood Pressure, Heart Rate</li>
+                <li>Daily Steps</li>
+            </ul>
+        
+            <h4 style="margin-top: 15px;">📊 What Happens in the Backend?</h4>
+            <p>When a user submits their data:</p>
+            <ol style="color: black; font-size: 20px;">
+                <li>The form data is sent to our Django backend.</li>
+                <li>The selected ML model processes the input.</li>
+                <li>Predictions are made in real-time to detect potential sleep disorders.</li>
+                <li>Based on output, the user receives their prediction and precautionary suggestions.</li>
+            </ol>
+        
+            <h3 style="color: #000000;">✅ Benefits of This System:</h3>
+            <ul style="color: black; font-size: 20px;">
+                <li>Early detection of sleep issues</li>
+                <li>Non-invasive & user-friendly diagnosis support</li>
+                <li>Accessible prediction using real-world health parameters</li>
+            </ul>
+        
+            <p style="margin-top: 20px; color: #000;"><strong><b>👉 A good night's sleep is not a luxury—it's a necessity. Let’s use technology to ensure better rest and healthier lives!</b></strong></p>
+        </section>
+        
+        {% endblock %}
+
+    </div>
+</body>
+
+
+</html>

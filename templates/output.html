@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Prediction Result{% endblock %}
+{% block nav_title %}Prediction Output{% endblock %}
+
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <title>Output - Sleep Disorder Detection</title>
+    <link rel="shortcut icon" href="{% static 'images/moon.png' %}" type="image/png">
+    <!-- Your other CSS/JS links -->
+</head>
+
+<div style="color: white; text-align: left;">
+    <h2 style="font-size: 28px; color: #273a4e; text-align: center;">🧾 Your Sleep Disorder Prediction:</h2>
+    <p style="font-size: 22px;color: black;text-align: center;"><strong>Prediction:</strong> {{ prediction }}</p>
+
+    {% if prediction == "Insomnia" %}
+        <h3 style="color: #e74c3c;margin-top: 40px;">🛌 Common Symptoms of Insomnia:</h3>
+        <ul style="font-size: 18px;color: black;">
+            <li>Difficulty falling or staying asleep</li>
+            <li>Feeling tired even after a full night's rest</li>
+            <li>Low energy, mood swings, or irritability</li>
+        </ul>
+
+        <h3 style="color: #186e3c;margin-top: 45px;">✅ Effective Ways to Manage Insomnia:</h3>
+        <ul style="font-size: 18px; color: black;">
+            <li>Stick to a consistent sleep and wake schedule</li>
+            <li>Reduce screen time 1 hour before bed</li>
+            <li>Limit naps during the day</li>
+            <li>Avoid heavy meals, caffeine, or alcohol late in the evening</li>
+            <li>Practice meditation or breathing exercises to calm the mind</li>
+        </ul>
+
+        <p style="margin-top: 15px; font-style: italic;font-size: 21px;">💡 Tip: Even 15 minutes of calm reflection before bed can improve your sleep quality.</p>
+
+    {% elif prediction == "Sleep Apnea" %}
+        <h3 style="color: #e74c3c; margin-top: 40px;">🌬️ Common Symptoms of Sleep Apnea:</h3>
+        <ul style="font-size: 18px;color: black;">
+            <li>Interrupted breathing, loud snoring</li>
+            <li>Frequent nighttime awakenings</li>
+            <li>Morning headaches, dry mouth, or fatigue</li>
+        </ul>
+
+        <h3 style="color: #186e3c;">✅ Recommendations to Reduce Sleep Apnea:</h3>
+        <ul style="font-size: 18px;color: black;">
+            <li>Try sleeping on your side</li>
+            <li>Exercise regularly and maintain a healthy weight</li>
+            <li>Avoid alcohol or sedatives before bedtime</li>
+            <li>Consult a sleep doctor for further diagnosis (like CPAP therapy)</li>
+        </ul>
+
+        <p style="margin-top: 15px; font-style: italic;font-size: 21px;">💡 Tip: Consistent lifestyle changes can greatly reduce apnea symptoms and improve energy levels.</p>
+
+    {% elif prediction == "None" %}
+        <h3 style="color: #186e3c;color: black;">🎉 No Signs of Major Sleep Disorders Detected!</h3>
+        <p style="font-size: 18px;">You're doing a great job maintaining healthy sleep habits. However, consistency is key to long-term well-being!</p>
+
+        <h4 style="color: #156aa3;">🌙 Tips to Keep Your Sleep Quality High:</h4>
+        <ul style="font-size: 18px; color: black;">
+            <li>Follow a daily sleep routine—even on weekends</li>
+            <li>Get morning sunlight to regulate your internal clock</li>
+            <li>Exercise, but not too close to bedtime</li>
+            <li>Create a dark, quiet, cool sleep environment</li>
+            <li>Use your bed only for sleep—no scrolling or work!</li>
+        </ul>
+
+        <p style="margin-top: 15px; font-style: italic;font-size: 21px;">💡 You're on the right track! Keep going—better sleep means a better life.</p>
+    {% endif %}
+
+    <p style="margin-top: 30px; color: #d00909; font-size: 18px;"><strong>📝 Note:</strong> This is a machine learning-based prediction and should not replace professional medical advice. If symptoms persist, consider consulting a certified sleep specialist.</p>
+    
+    <div class="but" style="text-align: right;">
+        <span style="margin: 40px 10px; text-align: right;">
+            <a href="{% url 'base' %}" style="text-decoration: none;">
+                <button style="background: linear-gradient(to right, #00b4db, #0083b0); color: white; font-size: 18px; padding: 12px 25px; border: none; border-radius: 10px; cursor: pointer;">
+                    🏠 Back to Home
+                </button>
+            </a>
+        </span>
+        <span style="margin: 40px 10px; text-align: right;">
+            <a href="{% url 'home' %}" style="text-decoration: none;">
+                <button style="background: linear-gradient(to right, #00b4db, #0083b0); color: white; font-size: 18px; padding: 12px 25px; border: none; border-radius: 10px; cursor: pointer;">
+                    🏠 Back to LOGIN Page
+                </button>
+            </a>
+        </span>
+    </div>
+</div>
+{% endblock %}

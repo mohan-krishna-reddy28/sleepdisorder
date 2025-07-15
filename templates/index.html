@@ -1,0 +1,388 @@
+<!-- {% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Real-Time Detection and Classification of Sleep Disorders Using Deep Learning for Improved Health Monitoring</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link href="{% static 'layout/styles/layout.css' %}" rel="stylesheet" type="text/css" media="all">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+        }
+        .bgded {
+            background-image: url('{% static "images/01.avif" %}');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding-top: 50px; /* Ensure top padding for spacing */
+        }
+        .heading {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #fff;
+            margin-bottom: 30px; /* Add margin to create space below the heading */
+        }
+        .login-container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+        .input100 {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .btn {
+            background: #007BFF;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="bgded">
+        <h3 class="heading">Real-Time Detection and Classification of Sleep Disorders Using Deep Learning for Improved Health Monitoring</h3>
+        <div class="login-container">
+            <form action='input' method="POST" enctype="multipart/form-data" class="login100-form validate-form">
+                {% csrf_token %}
+                <label for="name">Name</label>
+                <input class="input100" type="text" name="name" id="name" required>
+                <label for="password">Password</label>
+                <input class="input100" type="password" name="password" id="password" required>
+                <button type="submit" class="btn">LOGIN</button>
+            </form>
+        </div>
+    </div>
+    
+    <script src="{% static 'layout/scripts/jquery.min.js' %}"></script>
+    <script src="{% static 'layout/scripts/jquery.backtotop.js' %}"></script>
+    <script src="{% static 'layout/scripts/jquery.mobilemenu.js' %}"></script>
+</body>
+</html> -->
+
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Login - Sleep Disorder Detection</title>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="{% static 'images/moon.png' %}" type="image/png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{% static 'layout/styles/layout.css' %}" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" /> -->
+
+
+    <style>
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            font-family: sans-serif;
+        }
+
+        .blur-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(2px);
+            background-color: rgba(0, 0, 0, 0.3);
+            z-index: 1;
+        }
+
+        .body {
+            background-image: url("{% static 'images/Login_bg.jpg' %}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-repeat: no-repeat;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .heading {
+            text-align: center;
+            color: #000;
+            font-size: 28px;
+            padding: 0 40px;
+        }
+
+        .login-wrapper {
+            background-color: rgb(42 43 42);
+            padding: 40px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            color: #fff;
+            box-shadow: 0 8px 32px 0 rgb(0 0 0);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            animation: fadeInUp 1s ease;
+        }
+
+        .login-wrapper h2 {
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .input-icon-group i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ccc;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input100 {
+            width: 100%;
+            padding: 12px 40px 12px 35px;
+            /* left for lock, right for eye icon */
+            border: none;
+            border-bottom: 2px solid #ccc;
+            background-color: transparent;
+            color: #fff;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .input100:focus {
+            outline: none;
+            border-color: #00bfff;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background-color: #00bfff;
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #009acd;
+        }
+
+        .bottom-text {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+
+        .bottom-text a {
+            color: #fff;
+            text-decoration: underline;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 90px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .heading {
+                font-size: 22px;
+                padding: 0 20px;
+            }
+
+            .login-wrapper {
+                padding: 30px;
+                max-width: 100%;
+            }
+
+            .input100 {
+                width: 85%;
+                font-size: 0.95rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .heading {
+                font-size: 20px;
+                padding: 0 10px;
+            }
+
+            .login-wrapper {
+                padding: 20px;
+            }
+
+            .btn {
+                font-size: 0.95rem;
+                padding: 10px;
+            }
+
+            .input100 {
+                font-size: 0.9rem;
+                width: 80%;
+            }
+
+            .input-icon-group i {
+                font-size: 0.9rem;
+            }
+        }
+
+        .input-icon-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-icon-group i {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ccc;
+            font-size: 1rem;
+            z-index: 2;
+        }
+
+        .input-icon-group i.fa-lock,
+        .input-icon-group i.fa-envelope {
+            left: 10px;
+        }
+
+        .input-icon-group i.toggle-password {
+            text-align: end;
+            right: 2%;
+            cursor: pointer;
+        }
+
+
+
+        @keyframes fadeInUp {
+            from {
+                transform: translateY(40px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="body">
+        <div class="blur-overlay"></div>
+
+        <div class="content-wrapper">
+            <h3 class="heading">Real-Time Detection and Classification of Sleep Disorders Using Deep Learning for
+                Improved Health Monitoring</h3>
+
+            <div class="login-wrapper">
+                <h2>Login</h2>
+                <form action="{% url 'home' %}" method="POST" enctype="multipart/form-data"
+                    class="login100-form validate-form">
+                    {% csrf_token %}
+
+                    <!-- Name Field -->
+                    <div class="input-icon-group">
+                        <i class="fas fa-envelope"></i>
+                        <input class="input100" type="text" name="name" placeholder="Enter your Name" required>
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="input-icon-group">
+                        <i class="fas fa-lock"></i>
+                        <input class="input100" type="password" name="password" id="password"
+                            placeholder="Enter your password" required>
+                        <i class="fas fa-eye toggle-password" id="togglePassword"></i>
+                    </div>
+                    {% if error %}
+                    <div style="
+    color: #cc0000;
+    padding: 12px 20px;
+    margin: 10px auto 20px auto;
+    width: 80%;
+    text-align: center;
+    font-weight: bold;
+    font-family: Arial, sans-serif;
+">
+                        {{ error }}
+                    </div>
+                    {% endif %}
+
+                    <button type="submit" class="btn"><b>LOGIN</b></button>
+
+
+
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script src="{% static 'layout/scripts/jquery.min.js' %}"></script>
+    <script src="{% static 'layout/scripts/jquery.backtotop.js' %}"></script>
+    <script src="{% static 'layout/scripts/jquery.mobilemenu.js' %}"></script>
+    <script>
+        const togglePassword = document.getElementById("togglePassword");
+        const passwordInput = document.getElementById("password");
+
+        togglePassword.addEventListener("click", function () {
+            const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+            passwordInput.setAttribute("type", type);
+
+            // Toggle eye / eye-slash icon
+            this.classList.toggle("fa-eye");
+            this.classList.toggle("fa-eye-slash");
+        });
+    </script>
+
+</body>
+
+</html>
