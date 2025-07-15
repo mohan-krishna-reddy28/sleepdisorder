@@ -4,7 +4,7 @@ import numpy as np
 from django.shortcuts import render, redirect
 from django import forms
 from django.http import HttpResponse
-from django.conf import settings # <-- ADD THIS IMPORT
+from django.conf import settings # <-- THIS IMPORT IS CRUCIAL
 
 # For Keras model loading
 from tensorflow.keras.models import load_model as keras_load_model
@@ -55,7 +55,7 @@ def load_ml_assets():
             # It's best practice to put them in a dedicated folder, e.g., 'model_files'
             # at the root of your Django project (where manage.py is).
             MODEL_FILES_DIR = os.path.join(settings.BASE_DIR, 'model_files')
-            
+
             CNN_MODEL_PATH = os.path.join(MODEL_FILES_DIR, 'cnn_model.h5')
             SCALER_PATH = os.path.join(MODEL_FILES_DIR, 'scaler_n.pkl')
             LABEL_ENCODERS_PATH = os.path.join(MODEL_FILES_DIR, 'label_encoders.pkl')
@@ -133,4 +133,70 @@ def output(request):
 
             # Ensure models are loaded before proceeding
             if global_cnn_model is None or global_scaler is None or global_label_encoders is None:
-                return HttpResponse("Prediction resources are")
+                return HttpResponse("Prediction resources are not available.", status=503)
+
+            # Collect data, applying label encoding to categorical fields
+            cleaned_data = form.cleaned_data
+            processed_data = {}
+
+            form_categorical_cols = [
+                'gender', 'occupation', 'bmi_category', 'blood_pressure'
+            ]
+
+            column_name_map = {
+                'gender': 'Gender',
+                'occupation': 'Occupation',
+                'bmi_category': 'BMI Category',
+                'blood_pressure': 'Blood Pressure'
+            }
+
+            for key, value in cleaned_data.items():
+                if key in form_categorical_cols:
+                    original_col_name = column_name_map.get(key, key.capitalize())
+                    # Use global_label_encoders here
+                    if original_col_name in global_label_encoders:
+                        processed_data[key] = global_label_encoders[original_col_name].transform([str(value)])[0]
+                    else:
+                        print(f"Warning: LabelEncoder not found for {original_col_name}. Using raw value.")
+                        processed_data[key] = int(value)
+                else:
+                    processed_data[key] = float(value) if isinstance(value, (int, float)) else int(value)
+
+            feature_order = [
+                'gender', 'age', 'occupation', 'sleep_duration', 'quality_of_sleep',
+                'physical_activity_level', 'stress_level', 'bmi_category',
+                'blood_pressure', 'heart_rate', 'daily_steps'
+            ]
+
+            input_features = [processed_data[f] for f in feature_order]
+
+            data = np.array(input_features).reshape(1, -1)
+
+            # Apply the scaler to the numerical features using global_scaler
+            data = global_scaler.transform(data)
+
+            selected_algorithm = form.cleaned_data['algorithm']
+            prediction = "Error: Model not found"
+
+            # Use global_cnn_model, global_rf_model, global_lstm_model
+            if selected_algorithm == 'RF' and global_rf_model:
+                prediction = disorder_mapping[global_rf_model.predict(data)[0]]
+            elif selected_algorithm == 'CNN' and global_cnn_model:
+                cnn_prediction = global_cnn_model.predict(data.reshape(1, 11, 1))
+                prediction = disorder_mapping[np.argmax(cnn_prediction)]
+            elif selected_algorithm == 'LSTM' and global_lstm_model:
+                prediction = disorder_mapping[np.argmax(global_lstm_model.predict(data.reshape(1, 11, 1)))]
+            else:
+                prediction = "Selected algorithm model not loaded or invalid."
+
+            return render(request, 'output.html', {'prediction': prediction})
+    return render(request, 'input.html', {'form': SleepForm()})
+
+def about(request):
+    return render(request, 'about.html')
+
+def team(request):
+    return render(request, 'team.html')
+
+def base(request):
+    return render(request, 'base.html')
