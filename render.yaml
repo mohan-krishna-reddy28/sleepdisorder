@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: sleep-disorder-app
+    env: python
+    rootDir: FRONTEND
+    # ... other settings like buildCommand, startCommand ...
+
+    envVars:
+      # SECRET_KEY
+      - key: SECRET_KEY
+        generateValue: true # Render will automatically generate a secure value
+
+      # DATABASE_URL
+      - key: DATABASE_URL
+        fromDatabase: # Use this if you have a Render-managed PostgreSQL database
+          name: your-render-postgres-db-name # <<< REPLACE with your actual Render DB name
+          property: connectionString
+        # OR, if using an external database, use 'value' instead of 'fromDatabase':
+        # value: "postgres://user:password@external-db-host:5432/your_db_name"
+
+      # DJANGO_DEBUG
+      - key: DJANGO_DEBUG
+        value: "False" # Note: values are strings
+
+      # DJANGO_ALLOWED_HOSTS (Optional, as RENDER_EXTERNAL_HOSTNAME handles default)
+      # - key: DJANGO_ALLOWED_HOSTS
+      #   value: "yourcustomdomain.com,another.yourcustomdomain.com" # Comma-separated list
+
+      # WEB_CONCURRENCY (useful for Gunicorn workers, can replace --workers in startCommand)
+      - key: WEB_CONCURRENCY
+        value: 4 # Match this with the --workers value in startCommand
