@@ -23,13 +23,14 @@ markdown-it-py==3.0.0
 MarkupSafe==3.0.2
 matplotlib==3.10.3
 mdurl==0.1.2
+# ml_dtypes was removed in a previous step to resolve a conflict. Keep it removed.
 numpy==2.1.3
 opt_einsum==3.4.0
 optree==0.16.0
 packaging==25.0
 pandas==2.3.1
 pillow==11.3.0
-protobuf==4.25.3
+protobuf==4.25.3  # Corrected in previous step
 Pygments==2.19.2
 pyparsing==3.2.3
 python-dateutil==2.9.0.post0
@@ -43,8 +44,8 @@ whitenoise==6.6.0
 dj-database-url==2.1.0
 psycopg2-binary==2.9.9
 sqlparse==0.5.3
-tensorflow==2.16.2 
-tensorboard==2.19.0
+tensorflow==2.16.2
+tensorboard==2.16.2  # <-- ADJUSTED THIS VALUE
 tensorboard-data-server==0.7.2
 tensorflow-io-gcs-filesystem==0.31.0
 termcolor==3.1.0
