@@ -50,7 +50,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'webapp.urls' # CRITICAL CHANGE: Changed from 'self.urls'
+ROOT_URLCONF = 'webapp.urls'
 
 TEMPLATES = [
     {
@@ -68,7 +68,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'webapp.wsgi.application' # CRITICAL CHANGE: Changed from 'self.wsgi.application'
+WSGI_APPLICATION = 'webapp.wsgi.application'
 
 
 # Database
@@ -80,7 +80,6 @@ DATABASES = { # CRITICAL CHANGE for production database
         conn_max_age=600 # Optional: connection pooling
     )
 }
-
 
 # Password validation
 # ... (rest of your password validators) ...
@@ -98,3 +97,4 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') # This will be the folder wh
 # OPTIONAL: Configure WhiteNoise storage for efficient static file serving
 # STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Make sure to run `pip install whitenoise` if you use this.
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
