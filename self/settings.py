@@ -1,19 +1,18 @@
+# FRONTEND/self/settings.py
 """
-Django settings for webapp project. <--- Updated project name if applicable
+Django settings for webapp project.
 """
 
 import os
-import dj_database_url # ADD THIS
+import dj_database_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 # Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/ <--- Updated Django version in comment
-
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'your-fallback-insecure-key')
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'your-fallback-insecure-key-please-change-in-prod')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
@@ -34,11 +33,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'webapp',  # <--- ADD THIS LINE
+    'webapp', # Your Django app
 ]
 
 MIDDLEWARE = [
-    'whitenoise.middleware.WhiteNoiseMiddleware' , # Keep this at the top if serving static via WhiteNoise
+    'whitenoise.middleware.WhiteNoiseMiddleware', # Keep this at the top if serving static via WhiteNoise
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -48,13 +47,13 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'self.urls'
+ROOT_URLCONF = 'self.urls' # Points to your main project's urls.py
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')], # <-- THIS LINE IS CRUCIAL
-        'APP_DIRS': True, # Keep this as True
+        'DIRS': [os.path.join(BASE_DIR, 'templates')], # Project-wide templates, if any (e.g., base.html for login)
+        'APP_DIRS': True, # This enables Django to find templates within each app's 'templates' folder (e.g., webapp/templates/)
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -70,8 +69,6 @@ WSGI_APPLICATION = 'self.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-
 DATABASES = {
     'default': dj_database_url.config(
         default=os.environ.get('DATABASE_URL', 'sqlite:///db.sqlite3'),
@@ -80,19 +77,27 @@ DATABASES = {
 }
 
 # Password validation
-# ... (rest of your password validators) ...
+# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
+# (The rest of your password validators go here)
 
 
 # Internationalization
-# ... (rest of i18n settings) ...
+# https://docs.djangoproject.com/en/5.2/topics/i18n/
+# (The rest of your i18n settings go here)
 
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] # This looks fine if you have a 'static' folder directly under FRONTEND
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') # This will be the folder where collectstatic puts files
 
-# OPTIONAL: Configure WhiteNoise storage for efficient static file serving
-# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-# Make sure to run `pip install whitenoise` if you use this.
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorag'
+# IMPORTANT: Ensure this list correctly points to ALL your static file directories.
+# Keep only the relevant paths. If you only have static files in webapp/static/,
+# remove the os.path.join(BASE_DIR, 'static') line.
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),         # For project-level static files (e.g., FRONTEND/static/)
+    os.path.join(BASE_DIR, 'webapp', 'static'), # For app-level static files (e.g., FRONTEND/webapp/static/)
+]
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') # Where `collectstatic` will gather all static files
+
+# Corrected STATICFILES_STORAGE for WhiteNoise
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

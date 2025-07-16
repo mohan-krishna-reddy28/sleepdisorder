@@ -1,3 +1,4 @@
+# FRONTEND/webapp/model_loader.py
 import os
 import joblib
 import tensorflow as tf
@@ -29,29 +30,26 @@ def load_model_and_preprocessors():
     if not _models: # If _models is empty, it means they haven't been loaded yet
         logger.info("Starting to load machine learning models and preprocessors...")
         try:
-            # Load Keras models (e.g., CNN_Sleep.h5, LSTM_Sleep.h5, ANN_Sleep.h5)
-            # Ensure these filenames match exactly what you saved!
+            # Load Keras models (CNN and LSTM)
+            # Ensure these filenames match exactly what you saved: CNN_Sleep.h5, LSTM_Sleep.h5
             _models['cnn_model'] = tf.keras.models.load_model(_get_model_path('CNN_Sleep.h5'))
             logger.info("CNN model loaded.")
 
             _models['lstm_model'] = tf.keras.models.load_model(_get_model_path('LSTM_Sleep.h5'))
             logger.info("LSTM model loaded.")
 
-            # _models['ann_model'] = tf.keras.models.load_model(_get_model_path('ANN_Sleep.h5'))
-            # logger.info("ANN model loaded.")
+            # Load Scikit-learn models/preprocessors (Scaler, Label Encoders, Random Forest)
+            # Ensure these filenames match exactly what you saved: scaler.pkl, label_encoders.pkl, RF_Sleep.pkl
+            _models['scaler'] = joblib.load(_get_model_path('scaler.pkl'))
+            logger.info("Scaler loaded.")
 
-            # Load Scikit-learn models/preprocessors (e.g., scaler.pkl, label_encoders.pkl, RF_Sleep.pkl)
-            # Ensure these filenames match exactly what you saved!
-            # _models['scaler'] = joblib.load(_get_model_path('scaler.pkl'))
-            # logger.info("Scaler loaded.")
-
-            # _models['label_encoders'] = joblib.load(_get_model_path('label_encoders.pkl'))
-            # logger.info("Label encoders loaded.")
+            _models['label_encoders'] = joblib.load(_get_model_path('label_encoders.pkl'))
+            logger.info("Label encoders loaded.")
 
             _models['rf_model'] = joblib.load(_get_model_path('RF_Sleep.pkl'))
             logger.info("Random Forest model loaded.")
 
-            logger.info("All models and preprocessors loaded successfully!")
+            logger.info("All essential models and preprocessors loaded successfully!")
 
         except Exception as e:
             logger.error(f"Error loading models or preprocessors: {e}", exc_info=True)
@@ -66,6 +64,9 @@ def get_loaded_models():
     return _models
 
 try:
+    # Attempt to load models at app startup (on the first worker)
+    # This is where the heavy lifting happens, potentially causing timeout on free tier
     load_model_and_preprocessors()
 except Exception:
+    # Catch and pass if loading fails at startup (error will be logged by the loader function itself)
     pass
