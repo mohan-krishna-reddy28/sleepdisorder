@@ -16,12 +16,14 @@ _models = {} # Dictionary to store loaded models
 def _get_model_path(filename):
     """
     Helper to construct absolute path to model files.
-    Looks for models in the SAME directory as this model_loader.py.
+    Looks for models in the parent directory of this model_loader.py.
+    (i.e., from webapp/ go up to FRONTEND/)
     """
     # Current directory of model_loader.py is FRONTEND/webapp/
-    # Models are also in FRONTEND/webapp/
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(current_dir, filename)
+    # Go up one level to FRONTEND/ (where your models are)
+    models_dir = os.path.dirname(current_dir)
+    return os.path.join(models_dir, filename)
 
 def load_model_and_preprocessors():
     if not _models: # If _models is empty, it means they haven't been loaded yet
@@ -35,9 +37,6 @@ def load_model_and_preprocessors():
             _models['lstm_model'] = tf.keras.models.load_model(_get_model_path('LSTM_Sleep.h5'))
             logger.info("LSTM model loaded.")
 
-            _models['rf_model'] = joblib.load(_get_model_path('RF_Sleep.pkl'))
-            logger.info("Random Forest model loaded.")
-            
             # _models['ann_model'] = tf.keras.models.load_model(_get_model_path('ANN_Sleep.h5'))
             # logger.info("ANN model loaded.")
 
@@ -49,6 +48,8 @@ def load_model_and_preprocessors():
             # _models['label_encoders'] = joblib.load(_get_model_path('label_encoders.pkl'))
             # logger.info("Label encoders loaded.")
 
+            _models['rf_model'] = joblib.load(_get_model_path('RF_Sleep.pkl'))
+            logger.info("Random Forest model loaded.")
 
             logger.info("All models and preprocessors loaded successfully!")
 
