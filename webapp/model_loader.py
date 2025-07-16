@@ -35,19 +35,20 @@ def load_model_and_preprocessors():
             _models['lstm_model'] = tf.keras.models.load_model(_get_model_path('LSTM_Sleep.h5'))
             logger.info("LSTM model loaded.")
 
-            _models['ann_model'] = tf.keras.models.load_model(_get_model_path('ANN_Sleep.h5'))
-            logger.info("ANN model loaded.")
+            _models['rf_model'] = joblib.load(_get_model_path('RF_Sleep.pkl'))
+            logger.info("Random Forest model loaded.")
+            
+            # _models['ann_model'] = tf.keras.models.load_model(_get_model_path('ANN_Sleep.h5'))
+            # logger.info("ANN model loaded.")
 
             # Load Scikit-learn models/preprocessors (e.g., scaler.pkl, label_encoders.pkl, RF_Sleep.pkl)
             # Ensure these filenames match exactly what you saved!
-            _models['scaler'] = joblib.load(_get_model_path('scaler.pkl'))
-            logger.info("Scaler loaded.")
+            # _models['scaler'] = joblib.load(_get_model_path('scaler.pkl'))
+            # logger.info("Scaler loaded.")
 
-            _models['label_encoders'] = joblib.load(_get_model_path('label_encoders.pkl'))
-            logger.info("Label encoders loaded.")
+            # _models['label_encoders'] = joblib.load(_get_model_path('label_encoders.pkl'))
+            # logger.info("Label encoders loaded.")
 
-            _models['rf_model'] = joblib.load(_get_model_path('RF_Sleep.pkl'))
-            logger.info("Random Forest model loaded.")
 
             logger.info("All models and preprocessors loaded successfully!")
 
