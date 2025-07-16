@@ -30,7 +30,9 @@ optree==0.16.0
 packaging==25.0
 pandas==2.3.1
 pillow==11.3.0
-protobuf==4.25.3  # Corrected in previous step
+protobuf==4.25.3
+# ADDED: Required for PostgreSQL database connection
+psycopg2-binary
 Pygments==2.19.2
 pyparsing==3.2.3
 python-dateutil==2.9.0.post0
@@ -44,7 +46,7 @@ whitenoise==6.6.0
 dj-database-url==2.1.0
 sqlparse==0.5.3
 tensorflow-cpu==2.16.2
-tensorboard==2.16.2  # <-- ADJUSTED THIS VALUE
+tensorboard==2.16.2
 tensorboard-data-server==0.7.2
 tensorflow-io-gcs-filesystem==0.31.0
 termcolor==3.1.0
