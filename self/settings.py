@@ -53,14 +53,14 @@ ROOT_URLCONF = 'self.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [], # Or your template directories
-        'APP_DIRS': True,
+        'DIRS': [os.path.join(BASE_DIR, 'templates')], # <-- THIS LINE IS CRUCIAL
+        'APP_DIRS': True, # Keep this as True
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages', # <--- ENSURE THIS LINE IS HERE
+                'django.contrib.messages.context_processors.messages',
             ],
         },
     },
