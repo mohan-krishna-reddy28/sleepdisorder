@@ -99,8 +99,8 @@ def home(request):
         password = request.POST.get('password')
 
         try:
-            # Assuming 'account.txt' is also in the model_files directory for Render
-            account_file_path = os.path.join(settings.BASE_DIR, 'model_files', 'account.txt')
+            # CORRECTED PATH: Now points directly to the project root for account.txt
+            account_file_path = os.path.join(settings.BASE_DIR, 'account.txt')
             with open(account_file_path, 'r') as f:
                 accounts = [line.strip().split() for line in f.readlines()]
         except FileNotFoundError:
