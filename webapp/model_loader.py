@@ -2,9 +2,9 @@
 import os
 import joblib
 import tensorflow as tf
-import logging
+import logging # Added logging for better output
 
-# Configure logging
+# Configure logging for model_loader
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 handler = logging.StreamHandler()
@@ -12,61 +12,63 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
-_models = {} # Dictionary to store loaded models
+# BASE_DIR is the directory of this file: .../FRONTEND/webapp/
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-def _get_model_path(filename):
-    """
-    Helper to construct absolute path to model files.
-    Looks for models in the parent directory of this model_loader.py.
-    (i.e., from webapp/ go up to FRONTEND/)
-    """
-    # Current directory of model_loader.py is FRONTEND/webapp/
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    # Go up one level to FRONTEND/ (where your models are)
-    models_dir = os.path.dirname(current_dir)
-    return os.path.join(models_dir, filename)
+# Since your model files (scaler.pkl, CNN_Sleep_quantized.tflite, etc.)
+# are located directly in the 'FRONTEND' folder (one level up from 'webapp'),
+# we need to adjust the MODELS_DIR path accordingly.
+MODELS_DIR = os.path.dirname(BASE_DIR) # <-- THIS IS THE CRITICAL CHANGE
 
-def load_model_and_preprocessors():
-    if not _models: # If _models is empty, it means they haven't been loaded yet
-        logger.info("Starting to load machine learning models and preprocessors...")
-        try:
-            # Load Keras models (CNN and LSTM)
-            # Ensure these filenames match exactly what you saved: CNN_Sleep.h5, LSTM_Sleep.h5
-            _models['cnn_model'] = tf.keras.models.load_model(_get_model_path('CNN_Sleep.h5'))
-            logger.info("CNN model loaded.")
+logger.info(f"Attempting to load models from: {MODELS_DIR}") # Added for debugging confirmation
 
-            _models['lstm_model'] = tf.keras.models.load_model(_get_model_path('LSTM_Sleep.h5'))
-            logger.info("LSTM model loaded.")
-
-            # Load Scikit-learn models/preprocessors (Scaler, Label Encoders, Random Forest)
-            # Ensure these filenames match exactly what you saved: scaler.pkl, label_encoders.pkl, RF_Sleep.pkl
-            _models['scaler'] = joblib.load(_get_model_path('scaler.pkl'))
-            logger.info("Scaler loaded.")
-
-            _models['label_encoders'] = joblib.load(_get_model_path('label_encoders.pkl'))
-            logger.info("Label encoders loaded.")
-
-            _models['rf_model'] = joblib.load(_get_model_path('RF_Sleep.pkl'))
-            logger.info("Random Forest model loaded.")
-
-            logger.info("All essential models and preprocessors loaded successfully!")
-
-        except Exception as e:
-            logger.error(f"Error loading models or preprocessors: {e}", exc_info=True)
-            raise # Re-raise the error to ensure it's visible in Render logs
-
-    return _models
-
-def get_loaded_models():
-    if not _models:
-        logger.warning("Models not loaded yet. Calling load_model_and_preprocessors().")
-        load_model_and_preprocessors()
-    return _models
-
+# --- Load the StandardScaler ---
+SCALER_PATH = os.path.join(MODELS_DIR, 'scaler.pkl')
 try:
-    # Attempt to load models at app startup (on the first worker)
-    # This is where the heavy lifting happens, potentially causing timeout on free tier
-    load_model_and_preprocessors()
-except Exception:
-    # Catch and pass if loading fails at startup (error will be logged by the loader function itself)
-    pass
+    scaler = joblib.load(SCALER_PATH)
+    logger.info(f"Scaler loaded from: {SCALER_PATH}")
+except Exception as e:
+    logger.error(f"Error loading scaler from {SCALER_PATH}: {e}")
+    scaler = None # Set to None if loading fails
+
+# --- Load the Label Encoders ---
+LABEL_ENCODERS_PATH = os.path.join(MODELS_DIR, 'label_encoders.pkl')
+try:
+    label_encoders = joblib.load(LABEL_ENCODERS_PATH)
+    logger.info(f"Label encoders loaded from: {LABEL_ENCODERS_PATH}")
+except Exception as e:
+    logger.error(f"Error loading label encoders from {LABEL_ENCODERS_PATH}: {e}")
+    label_encoders = None
+
+# --- Load the Random Forest Model ---
+RF_MODEL_PATH = os.path.join(MODELS_DIR, 'RF_Sleep.pkl')
+try:
+    rf_model = joblib.load(RF_MODEL_PATH)
+    logger.info(f"Random Forest model loaded from: {RF_MODEL_PATH}")
+except Exception as e:
+    logger.error(f"Error loading Random Forest model from {RF_MODEL_PATH}: {e}")
+    rf_model = None
+
+# --- Load the Quantized TFLite CNN Model ---
+CNN_MODEL_PATH = os.path.join(MODELS_DIR, 'CNN_Sleep_quantized.tflite')
+cnn_interpreter = None
+try:
+    # Load the TFLite model and allocate tensors.
+    cnn_interpreter = tf.lite.Interpreter(model_path=CNN_MODEL_PATH)
+    cnn_interpreter.allocate_tensors()
+    logger.info(f"Quantized CNN TFLite model loaded from: {CNN_MODEL_PATH}")
+except Exception as e:
+    logger.error(f"Error loading quantized CNN TFLite model from {CNN_MODEL_PATH}: {e}")
+
+# --- Load the Quantized TFLite LSTM Model ---
+LSTM_MODEL_PATH = os.path.join(MODELS_DIR, 'LSTM_Sleep_quantized.tflite')
+lstm_interpreter = None
+try:
+    # Load the TFLite model and allocate tensors.
+    lstm_interpreter = tf.lite.Interpreter(model_path=LSTM_MODEL_PATH)
+    lstm_interpreter.allocate_tensors()
+    logger.info(f"Quantized LSTM TFLite model loaded from: {LSTM_MODEL_PATH}")
+except Exception as e:
+    logger.error(f"Error loading quantized LSTM TFLite model from {LSTM_MODEL_PATH}: {e}")
+
+logger.info("All models and preprocessors loading complete.")
