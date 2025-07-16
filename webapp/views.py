@@ -4,9 +4,13 @@ import numpy as np
 from django.shortcuts import render, redirect
 from django import forms
 from django.http import HttpResponse
-from django.conf import settings # <-- THIS IMPORT IS CRUCIAL
+from django.conf import settings
 
 # For Keras model loading
+# IMPORTANT: Keras models (CNN, LSTM) are typically saved as .h5 or .keras, not .pkl.
+# If your CNN_Sleep.pkl and LSTM_Sleep.pkl are truly Keras models, you should re-save them as .h5
+# and use keras_load_model. For now, I'm assuming they are loaded via joblib.load()
+# as their extension is .pkl. If this causes errors, you MUST check your model saving process.
 from tensorflow.keras.models import load_model as keras_load_model
 
 # Form class defined directly in views.py
@@ -15,7 +19,8 @@ class SleepForm(forms.Form):
     OCCUPATION_CHOICES = [('0', 'Student'), ('1', 'Employee'), ('2', 'Self-employed')]
     BMI_CHOICES = [('0', 'Underweight'), ('1', 'Normal weight'), ('2', 'Overweight'), ('3', 'Obese')]
     BP_CHOICES = [('0', 'Low'), ('1', 'Normal'), ('2', 'High')]
-    ALGORITHM_CHOICES = [('CNN', 'CNN')]
+    # --- CORRECTED: Include all algorithms from your UI ---
+    ALGORITHM_CHOICES = [('RF', 'Random Forest'), ('CNN', 'CNN'), ('LSTM', 'LSTM')]
 
     gender = forms.ChoiceField(choices=GENDER_CHOICES)
     age = forms.IntegerField()
@@ -36,9 +41,9 @@ class SleepForm(forms.Form):
 # They are initialized to None.
 global_cnn_model = None
 global_scaler = None
-global_label_encoders = None
-global_rf_model = None # Placeholder for RF model
-global_lstm_model = None # Placeholder for LSTM model
+global_label_encoders = None # Assuming you have a label_encoders.pkl file at the root
+global_rf_model = None
+global_lstm_model = None
 
 def load_ml_assets():
     """
@@ -47,46 +52,94 @@ def load_ml_assets():
     """
     global global_cnn_model, global_scaler, global_label_encoders, global_rf_model, global_lstm_model
 
-    # Only load if the CNN model (or any other main asset) is not already in memory
-    if global_cnn_model is None:
+    # Only load if models haven't been loaded yet (e.g., first request)
+    if global_cnn_model is None or global_rf_model is None or global_lstm_model is None:
         print("Attempting to load ML assets for the first time...")
         try:
-            # Define the directory where your model files are stored.
-            # It's best practice to put them in a dedicated folder, e.g., 'model_files'
-            # at the root of your Django project (where manage.py is).
-            MODEL_FILES_DIR = os.path.join(settings.BASE_DIR, 'model_files')
+            # --- CORRECTED PATHS AND FILENAMES based on your project structure ---
+            # All files are directly in BASE_DIR (project root), not in a 'model_files' subfolder.
+            CNN_MODEL_PATH = os.path.join(settings.BASE_DIR, 'CNN_Sleep.pkl') # Corrected filename and path
+            SCALER_PATH = os.path.join(settings.BASE_DIR, 'scaler.pkl')       # Corrected filename and path
+            LABEL_ENCODERS_PATH = os.path.join(settings.BASE_DIR, 'label_encoders.pkl') # Assuming this exists at root
+            RF_MODEL_PATH = os.path.join(settings.BASE_DIR, 'RF_Sleep.pkl')   # Corrected filename and path
+            LSTM_MODEL_PATH = os.path.join(settings.BASE_DIR, 'LSTM_Sleep.pkl') # Corrected filename and path
 
-            CNN_MODEL_PATH = os.path.join(MODEL_FILES_DIR, 'cnn_model.h5')
-            SCALER_PATH = os.path.join(MODEL_FILES_DIR, 'scaler_n.pkl')
-            LABEL_ENCODERS_PATH = os.path.join(MODEL_FILES_DIR, 'label_encoders.pkl')
-
-            # Basic checks to ensure files exist
+            # Basic checks to ensure files exist and provide warnings if not
             if not os.path.exists(CNN_MODEL_PATH):
                 raise FileNotFoundError(f"CNN model not found: {CNN_MODEL_PATH}")
             if not os.path.exists(SCALER_PATH):
                 raise FileNotFoundError(f"Scaler not found: {SCALER_PATH}")
+            # Optional: Check for label_encoders.pkl, and initialize if not found
             if not os.path.exists(LABEL_ENCODERS_PATH):
-                raise FileNotFoundError(f"Label encoders not found: {LABEL_ENCODERS_PATH}")
+                print(f"Warning: Label encoders not found at {LABEL_ENCODERS_PATH}. Initializing empty dict.")
+                global_label_encoders = {} # Provide a fallback to prevent KeyError later
+            if not os.path.exists(RF_MODEL_PATH):
+                print(f"Warning: RF model not found at {RF_MODEL_PATH}. RF predictions will not be available.")
+            if not os.path.exists(LSTM_MODEL_PATH):
+                print(f"Warning: LSTM model not found at {LSTM_MODEL_PATH}. LSTM predictions will not be available.")
 
-            global_cnn_model = keras_load_model(CNN_MODEL_PATH)
-            global_scaler = joblib.load(SCALER_PATH)
-            global_label_encoders = joblib.load(LABEL_ENCODERS_PATH)
+            # --- Model Loading ---
+            # IMPORTANT: Keras models (CNN, LSTM) typically use .h5 or .keras extension.
+            # If your CNN_Sleep.pkl and LSTM_Sleep.pkl are Keras models saved as .pkl,
+            # this is unconventional and might lead to issues. They might need to be
+            # re-saved as .h5 and loaded with `keras_load_model`.
+            # For now, we attempt to load all .pkl files using joblib.load().
 
-            # Assign placeholders for other models (load them if you save them later)
-            global_rf_model = None
-            global_lstm_model = None
+            try:
+                # If CNN_Sleep.pkl is a Keras model, you might need to change this
+                # to keras_load_model(CNN_MODEL_PATH) after saving it as .h5
+                global_cnn_model = joblib.load(CNN_MODEL_PATH)
+                print(f"Successfully loaded CNN model from {CNN_MODEL_PATH}")
+            except Exception as e:
+                print(f"ERROR: Failed to load CNN model from {CNN_MODEL_PATH}: {e}")
+                global_cnn_model = None
 
-            print("ML assets loaded successfully!")
+            try:
+                global_scaler = joblib.load(SCALER_PATH)
+                print(f"Successfully loaded scaler from {SCALER_PATH}")
+            except Exception as e:
+                print(f"ERROR: Failed to load scaler from {SCALER_PATH}: {e}")
+                global_scaler = None
+
+            # Load label encoders if the file exists
+            if os.path.exists(LABEL_ENCODERS_PATH):
+                try:
+                    global_label_encoders = joblib.load(LABEL_ENCODERS_PATH)
+                    print(f"Successfully loaded label encoders from {LABEL_ENCODERS_PATH}")
+                except Exception as e:
+                    print(f"ERROR: Failed to load label encoders from {LABEL_ENCODERS_PATH}: {e}")
+                    global_label_encoders = {} # Fallback
+
+            try:
+                global_rf_model = joblib.load(RF_MODEL_PATH)
+                print(f"Successfully loaded RF model from {RF_MODEL_PATH}")
+            except Exception as e:
+                print(f"ERROR: Failed to load RF model from {RF_MODEL_PATH}: {e}")
+                global_rf_model = None
+
+            try:
+                # If LSTM_Sleep.pkl is a Keras model, you might need to change this
+                # to keras_load_model(LSTM_MODEL_PATH) after saving it as .h5
+                global_lstm_model = joblib.load(LSTM_MODEL_PATH)
+                print(f"Successfully loaded LSTM model from {LSTM_MODEL_PATH}")
+            except Exception as e:
+                print(f"ERROR: Failed to load LSTM model from {LSTM_MODEL_PATH}: {e}")
+                global_lstm_model = None
+
+            print("ML assets loading attempt completed.")
+
         except Exception as e:
-            print(f"CRITICAL ERROR: Failed to load ML assets: {e}")
-            # Reset globals to None if loading fails
+            # This outer catch is for critical errors like BASE_DIR not accessible,
+            # or fundamental problems preventing any loading attempt.
+            print(f"CRITICAL ERROR during initial ML assets loading: {e}")
+            # Ensure all globals are reset if a critical error occurs
             global_cnn_model = None
             global_scaler = None
             global_label_encoders = None
             global_rf_model = None
             global_lstm_model = None
-            # Re-raise the exception to indicate a problem to the calling view
-            raise
+            raise # Re-raise to show the error on the webpage
+
 
 # Mapping encoded values back to disorder types
 disorder_mapping = {0: 'None', 1: 'Sleep Apnea', 2: 'Insomnia'}
@@ -108,7 +161,7 @@ def home(request):
 
         for account in accounts:
             if len(account) >= 2 and account[0] == name and account[1] == password:
-                return redirect('base')
+                return redirect('base') # Assuming 'base' is your input page URL name
 
         return render(request, 'index.html', {'error': 'Wrong name or password'})
 
@@ -131,9 +184,20 @@ def output(request):
                 # If loading fails, return an error message
                 return HttpResponse(f"Server error: Could not load prediction resources. Details: {e}", status=500)
 
-            # Ensure models are loaded before proceeding
-            if global_cnn_model is None or global_scaler is None or global_label_encoders is None:
-                return HttpResponse("Prediction resources are not available.", status=503)
+            # Ensure models are loaded before proceeding based on selected algorithm
+            selected_algorithm = form.cleaned_data['algorithm']
+            
+            # Check if the specifically selected model is loaded
+            if selected_algorithm == 'CNN' and global_cnn_model is None:
+                 return HttpResponse("CNN Model is not available. Check server logs for loading errors.", status=503)
+            elif selected_algorithm == 'RF' and global_rf_model is None:
+                 return HttpResponse("Random Forest Model is not available. Check server logs for loading errors.", status=503)
+            elif selected_algorithm == 'LSTM' and global_lstm_model is None:
+                 return HttpResponse("LSTM Model is not available. Check server logs for loading errors.", status=503)
+            
+            if global_scaler is None or global_label_encoders is None:
+                return HttpResponse("Prediction pre-processing resources (scaler/encoders) are not available.", status=503)
+
 
             # Collect data, applying label encoding to categorical fields
             cleaned_data = form.cleaned_data
@@ -154,11 +218,11 @@ def output(request):
                 if key in form_categorical_cols:
                     original_col_name = column_name_map.get(key, key.capitalize())
                     # Use global_label_encoders here
-                    if original_col_name in global_label_encoders:
+                    if global_label_encoders and original_col_name in global_label_encoders:
                         processed_data[key] = global_label_encoders[original_col_name].transform([str(value)])[0]
                     else:
                         print(f"Warning: LabelEncoder not found for {original_col_name}. Using raw value.")
-                        processed_data[key] = int(value)
+                        processed_data[key] = int(value) # Fallback to raw int value
                 else:
                     processed_data[key] = float(value) if isinstance(value, (int, float)) else int(value)
 
@@ -175,16 +239,17 @@ def output(request):
             # Apply the scaler to the numerical features using global_scaler
             data = global_scaler.transform(data)
 
-            selected_algorithm = form.cleaned_data['algorithm']
-            prediction = "Error: Model not found"
+            prediction = "Error: Model not found" # Default error message
 
             # Use global_cnn_model, global_rf_model, global_lstm_model
             if selected_algorithm == 'RF' and global_rf_model:
                 prediction = disorder_mapping[global_rf_model.predict(data)[0]]
             elif selected_algorithm == 'CNN' and global_cnn_model:
+                # Reshape for CNN if needed (based on your original code, it expects 3D input)
                 cnn_prediction = global_cnn_model.predict(data.reshape(1, 11, 1))
                 prediction = disorder_mapping[np.argmax(cnn_prediction)]
             elif selected_algorithm == 'LSTM' and global_lstm_model:
+                # Reshape for LSTM if needed (based on your original code, it expects 3D input)
                 prediction = disorder_mapping[np.argmax(global_lstm_model.predict(data.reshape(1, 11, 1)))]
             else:
                 prediction = "Selected algorithm model not loaded or invalid."
